@@ -1,4 +1,4 @@
-# AI-Powered Document Review & Risk Insights Platform
+# Document Risk Intelligence Platform / AI-Powered Document Review & Risk Insights Platform
 
 Beginner-friendly business document intelligence system for summarizing contracts, invoices, audit notes, vendor agreements, policy updates, and meeting minutes.
 
