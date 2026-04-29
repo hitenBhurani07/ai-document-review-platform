@@ -1,4 +1,4 @@
-"""Lightweight retrieval helpers for grounding generation with local knowledge files."""
+"""Lightweight retrieval helpers for grounding document analysis with local knowledge files."""
 
 from __future__ import annotations
 
@@ -12,16 +12,16 @@ from typing import Dict, List
 
 DEFAULT_KNOWLEDGE_SNIPPETS = [
     (
-        "built_in://fever_cough",
-        "For fever and cough, include duration, associated symptoms, hydration status, and clear follow-up instructions.",
+        "built_in://contract_review",
+        "For contracts, capture effective dates, termination clauses, payment terms, and liability limits.",
     ),
     (
-        "built_in://hypertension_followup",
-        "For hypertension follow-up, document adherence, BP trends, lifestyle counseling, and monitoring plan.",
+        "built_in://invoice_review",
+        "For invoices, record invoice ID, due date, amount, and any overdue or penalty language.",
     ),
     (
-        "built_in://soap_structure",
-        "SOAP notes should separate patient-reported subjective details from objective findings and include an actionable plan.",
+        "built_in://risk_keywords",
+        "Common risk cues include breach, penalty, overdue, dispute, non-compliance, and escalation.",
     ),
 ]
 
@@ -127,7 +127,7 @@ def _build_index() -> Dict[str, object]:
     }
 
 
-def retrieve_clinical_context(query: str, top_k: int = 3) -> List[RetrievedChunk]:
+def retrieve_document_context(query: str, top_k: int = 3) -> List[RetrievedChunk]:
     """Retrieve top-k relevant knowledge chunks for grounding generation."""
     cleaned_query = query.strip()
     if not cleaned_query:

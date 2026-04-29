@@ -1,0 +1,3 @@
+Policy update effective 01/07/2026.
+New escalation protocol applies to overdue invoices and fraud alerts.
+All teams must record approval dates and retain records for 7 years.

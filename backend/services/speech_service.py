@@ -1,93 +1,22 @@
-"""Speech-to-text helpers built on Google Gemini API.
-
-The main entry point is `speech_to_text(file_path)`, which accepts a local audio
-file path and uses Google's Gemini API for transcription.
-"""
+"""Minimal helpers for loading uploaded document text."""
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
-from google.genai import Client
-from google.genai.types import Part
 
-from backend.core.config import settings
-
-
-logger = logging.getLogger(__name__)
-
-
-def speech_to_text(file_path: str) -> str:
-    """Transcribe an audio file into text using Google Gemini API.
+def read_text_document(file_path: str) -> str:
+    """Read a text document from disk.
 
     Args:
-        file_path: Path to an audio file (wav, mp3, m4a, flac, ogg, etc.).
+        file_path: Path to a .txt file.
 
     Returns:
-        Clean transcribed text.
-
-    Raises:
-        FileNotFoundError: If the audio file doesn't exist.
-        ValueError: If GEMINI_API_KEY is not configured.
+        Decoded text content.
     """
-    audio_path = Path(file_path)
-    if not audio_path.exists():
-        raise FileNotFoundError(f"Audio file not found: {file_path}")
-
-    if not settings.gemini_api_key:
-        raise ValueError(
-            "GEMINI_API_KEY not configured. Set it via environment variable or .env file. "
-            "Get your free API key from: https://aistudio.google.com/app/apikey"
-        )
-
-    try:
-        client = Client(api_key=settings.gemini_api_key)
-        logger.info("Processing audio file with Gemini: %s", file_path)
-
-        # Determine MIME type based on file extension
-        suffix = audio_path.suffix.lower()
-        mime_type_map = {
-            ".wav": "audio/wav",
-            ".mp3": "audio/mpeg",
-            ".m4a": "audio/mp4",
-            ".flac": "audio/flac",
-            ".ogg": "audio/ogg",
-        }
-        mime_type = mime_type_map.get(suffix, "audio/mpeg")
-
-        with open(audio_path, "rb") as f:
-            audio_data = f.read()
-
-        audio_part = Part.from_bytes(
-            data=audio_data,
-            mime_type=mime_type,
-        )
-
-        response = client.models.generate_content(
-            model=settings.gemini_transcription_model,
-            contents=[
-                (
-                    "Transcribe this clinical conversation as dialogue. "
-                    "Return only transcript lines, one utterance per line, prefixed with one of: "
-                    "Doctor:, Patient:, Nurse:, Accompanier:, Support Staff:, or Other:. "
-                    "Do not add analysis or extra commentary."
-                ),
-                audio_part,
-            ],
-        )
-
-        transcript = (response.text or "").strip()
-
-        if not transcript:
-            raise ValueError("Gemini transcription returned empty text.")
-
-        logger.info("Transcription complete")
-
-        return transcript
-    except FileNotFoundError:
-        logger.error(f"Audio file not found: {file_path}")
-        raise
-    except Exception as e:
-        logger.error(f"Error during transcription: {e}")
-        raise
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+    if path.suffix.lower() != ".txt":
+        raise ValueError("Only .txt files are supported")
+    return path.read_text(encoding="utf-8", errors="ignore").strip()

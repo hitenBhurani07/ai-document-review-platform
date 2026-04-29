@@ -3,80 +3,139 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinical NLP System</title>
+  <title>AI-Powered Document Review & Risk Insights Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <header class="navbar">
+    <div class="brand">
+      <span class="brand-mark">AI</span>
+      <div>
+        <p class="brand-name">AI-Powered Document Review & Risk Insights Platform</p>
+        <p class="brand-subtitle">Business Document Intelligence System</p>
+      </div>
+    </div>
+    <div class="nav-note">Built for consulting, audit, finance, and compliance teams.</div>
+  </header>
+
   <main class="shell">
-    <section class="hero">
-      <p class="eyebrow">Clinical NLP System</p>
-      <h1>Audio or Text to Clinical Notes</h1>
-      <p class="lede">Upload an audio file or enter clinical text to generate transcription, third-person summary, and a KSOAP clinical note using Google Gemini AI.</p>
+    <section class="hero fade-up" style="--delay: 0s;">
+      <p class="eyebrow">Document Intelligence</p>
+      <h1>Review business documents faster with structured risk insights.</h1>
+      <p class="lede">
+        Paste or upload contracts, invoices, audit notes, and policy documents. Instantly receive a
+        concise summary, key entities, risk flags, and recommended action items.
+      </p>
+      <div class="hero-strip">
+        <div>
+          <h3>Smart Summaries</h3>
+          <p>Concise overviews built for executive review.</p>
+        </div>
+        <div>
+          <h3>Risk Scoring</h3>
+          <p>Spot penalties, delays, disputes, and compliance gaps.</p>
+        </div>
+        <div>
+          <h3>Actionable Output</h3>
+          <p>Clear next steps and missing information alerts.</p>
+        </div>
+      </div>
     </section>
 
-    <section class="card panel-grid">
-      <div class="panel panel-upload">
-        <div class="panel-header">
+    <section class="workspace">
+      <div class="card input-card fade-up" style="--delay: 0.08s;">
+        <div class="card-header">
           <div>
-            <p class="panel-kicker">Step 1</p>
-            <h2>Choose Input</h2>
+            <p class="card-kicker">Input</p>
+            <h2>Analyze a document</h2>
           </div>
-          <p class="panel-hint">Audio (WAV, MP3, etc.) or Text</p>
+          <p class="card-hint">Paste text or upload a .txt file.</p>
         </div>
 
-        <div class="input-tabs">
-          <button class="tab-btn active" data-tab="audio">Upload Audio</button>
-          <button class="tab-btn" data-tab="text">Enter Text</button>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="text">Paste Text</button>
+          <button class="tab-btn" data-tab="file">Upload File</button>
         </div>
 
-        <div id="audio-tab" class="tab-content active">
-          <label class="file-input" for="audioFile">
-            <span class="file-input-label">Choose audio file</span>
+        <div id="text-panel" class="tab-panel active">
+          <textarea
+            id="documentText"
+            class="text-input"
+            placeholder="Example: ABC Technologies entered a 12 month vendor agreement with Sigma Logistics effective 1 January 2026. Payment of Rs 4,50,000 is due within 30 days. Delay beyond due date attracts a penalty charge of 5%."
+            rows="8"
+          ></textarea>
+          <div class="sample-actions">
+            <button id="sampleBtn" type="button" class="secondary-btn">Insert Sample Text</button>
+            <span class="sample-hint">Use a realistic vendor agreement snippet.</span>
+          </div>
+        </div>
+
+        <div id="file-panel" class="tab-panel">
+          <label class="file-input" for="documentFile">
+            <span class="file-input-label">Choose a .txt document</span>
             <span id="fileName" class="file-input-name">No file selected</span>
           </label>
-          <input id="audioFile" type="file" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg" hidden />
-          <p class="tab-hint">Supported: WAV, MP3, M4A, FLAC, OGG</p>
-        </div>
-
-        <div id="text-tab" class="tab-content">
-          <textarea id="clinicalText" class="text-input" placeholder="Enter clinical text here. Example: Patient reports fever and cough for two days..." rows="6"></textarea>
+          <input id="documentFile" type="file" accept=".txt" hidden />
+          <p class="tab-hint">Supported: plain text (.txt)</p>
         </div>
 
         <div class="actions">
-          <button id="generateBtn" type="button">
-            <span class="btn-text">Generate Medical Notes</span>
+          <button id="analyzeBtn" type="button" class="primary-btn">
+            <span class="btn-text">Analyze Document</span>
             <span class="spinner" aria-hidden="true"></span>
           </button>
         </div>
 
         <div id="errorBox" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
-        <div id="statusBox" class="status" aria-live="polite">Ready to process audio or text.</div>
+        <div id="statusBox" class="status" aria-live="polite">Ready for analysis.</div>
       </div>
 
-      <div class="panel panel-results">
-        <div class="panel-header">
-          <div>
-            <p class="panel-kicker">Step 2</p>
-            <h2>Generated Results</h2>
-          </div>
-          <p class="panel-hint">Transcription, summary, and KSOAP note</p>
+      <div class="results fade-up" style="--delay: 0.16s;">
+        <div class="card result-card">
+          <h3>Summary</h3>
+          <p id="summaryOutput" class="result-text">No results yet.</p>
         </div>
 
-        <div class="results">
-          <section class="result-block" id="transcription-block">
-            <h3>Transcription</h3>
-            <pre id="transcription" class="output">No transcription yet.</pre>
-          </section>
+        <div class="card result-card">
+          <h3>Key Entities</h3>
+          <div class="entity-group">
+            <h4>Organizations</h4>
+            <div id="orgList" class="chip-list"></div>
+          </div>
+          <div class="entity-group">
+            <h4>Dates</h4>
+            <div id="dateList" class="chip-list"></div>
+          </div>
+          <div class="entity-group">
+            <h4>Amounts</h4>
+            <div id="amountList" class="chip-list"></div>
+          </div>
+          <div class="entity-group">
+            <h4>Invoice IDs</h4>
+            <div id="invoiceList" class="chip-list"></div>
+          </div>
+        </div>
 
-          <section class="result-block">
-            <h3>Summary</h3>
-            <pre id="summary" class="output">No summary yet.</pre>
-          </section>
+        <div class="card result-card">
+          <h3>Risk Flags</h3>
+          <ul id="riskList" class="result-list"></ul>
+        </div>
 
-          <section class="result-block result-block-wide">
-            <h3>KSOAP Note</h3>
-            <div id="soapNote" class="soap-output">No KSOAP note yet.</div>
-          </section>
+        <div class="card result-card">
+          <h3>Action Items</h3>
+          <ul id="actionList" class="result-list"></ul>
+        </div>
+
+        <div class="card result-card confidence-card">
+          <h3>Confidence Score</h3>
+          <div id="confidenceScore" class="confidence-badge">Not scored</div>
+          <p class="confidence-note">Based on document coverage, entities, and risk cues.</p>
         </div>
       </div>
     </section>

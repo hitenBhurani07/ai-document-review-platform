@@ -1,57 +1,55 @@
-"""End-to-end clinical NLP pipeline helpers.
-
-This module keeps the flow in one place:
-Audio -> Speech-to-Text -> Summarization -> SOAP Note
-"""
+"""End-to-end document analysis pipeline helpers."""
 
 from __future__ import annotations
 
 from typing import Any, Dict
 
-from backend.services.nlp_service import summarize_clinical_text
-from backend.services.rag_service import build_rag_payload
-from backend.services.speech_service import speech_to_text
+from backend.services.nlp_service import (
+    detect_risks,
+    extract_entities,
+    generate_action_items,
+    summarize_document,
+)
 from utils.privacy import sanitize_text
-from utils.soap_formatter import generate_soap
-from utils.speaker_ner import extract_speaker_entities, normalize_transcription_dialogue
+from utils.text_utils import normalize_text
 
 
-def process_text_pipeline(input_text: str) -> Dict[str, Any]:
-    """Run the clinical NLP pipeline on raw text input."""
+def _score_confidence(summary: str, entities: Dict[str, list[str]], risk_flags: list[str]) -> str:
+    score = 0
+    if summary:
+        score += 2
+    if entities.get("organizations"):
+        score += 1
+    if entities.get("dates"):
+        score += 1
+    if entities.get("amounts"):
+        score += 1
+    if entities.get("invoice_ids"):
+        score += 1
+    if risk_flags:
+        score += 1
+
+    if score >= 5:
+        return "High"
+    if score >= 3:
+        return "Medium"
+    return "Low"
+
+
+def analyze_document(input_text: str) -> Dict[str, Any]:
+    """Analyze a business document and return the structured insights."""
     sanitized_text = sanitize_text(input_text)
-    rag_payload = build_rag_payload(sanitized_text)
-    summary = summarize_clinical_text(sanitized_text)
-    soap_note = generate_soap(summary or sanitized_text)
+    cleaned_text = normalize_text(sanitized_text)
+    summary = summarize_document(cleaned_text)
+    entities = extract_entities(cleaned_text)
+    risk_flags = detect_risks(cleaned_text)
+    action_items = generate_action_items(cleaned_text, risk_flags, entities)
+    confidence_score = _score_confidence(summary, entities, risk_flags)
 
     return {
-        "sanitized_text": sanitized_text,
-        "transcription": None,
-        "transcription_dialogue": None,
         "summary": summary,
-        "soap_note": soap_note,
-        "rag_context": rag_payload["prompt_context"],
-        "rag_citations": rag_payload["citations"],
-    }
-
-
-def process_audio_pipeline(file_path: str) -> Dict[str, Any]:
-    """Run the full clinical NLP pipeline on an audio file."""
-    transcription = speech_to_text(file_path)
-    transcription_dialogue = normalize_transcription_dialogue(transcription)
-    transcription_entities = extract_speaker_entities(transcription)
-    sanitized_transcription = sanitize_text(transcription)
-    rag_payload = build_rag_payload(sanitized_transcription)
-    summary_input = transcription_dialogue or transcription
-    summary = summarize_clinical_text(summary_input)
-    soap_note = generate_soap(summary or sanitized_transcription)
-
-    return {
-        "sanitized_text": sanitized_transcription,
-        "transcription": transcription,
-        "transcription_dialogue": transcription_dialogue,
-        "transcription_entities": transcription_entities,
-        "summary": summary,
-        "soap_note": soap_note,
-        "rag_context": rag_payload["prompt_context"],
-        "rag_citations": rag_payload["citations"],
+        "key_entities": entities,
+        "risk_flags": risk_flags,
+        "action_items": action_items,
+        "confidence_score": confidence_score,
     }

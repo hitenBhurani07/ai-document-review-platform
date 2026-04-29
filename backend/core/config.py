@@ -11,7 +11,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 
 class Settings(BaseModel):
-    app_name: str = "Clinical NLP System"
+    app_name: str = "AI-Powered Document Review & Risk Insights Platform"
     environment: str = os.getenv("ENVIRONMENT", "development")
     hf_model_name: str = "google/flan-t5-small"
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")

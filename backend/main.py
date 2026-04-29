@@ -5,9 +5,12 @@ from backend.api.routes import router as api_router
 
 
 app = FastAPI(
-    title="Clinical NLP System",
-    description="Automated medical note generation with Whisper and HuggingFace Transformers.",
-    version="0.1.0",
+    title="AI-Powered Document Review & Risk Insights Platform",
+    description=(
+        "Analyze business documents to generate summaries, key entities, risk flags, "
+        "and recommended action items."
+    ),
+    version="1.0.0",
 )
 
 app.add_middleware(
@@ -26,12 +29,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router)
 
 
 @app.get("/")
 def root() -> dict[str, str]:
     return {
-        "message": "Clinical NLP System is running.",
+        "message": "AI-Powered Document Review & Risk Insights Platform is running.",
         "docs": "/docs",
     }

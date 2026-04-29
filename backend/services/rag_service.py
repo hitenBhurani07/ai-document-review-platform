@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from utils.rag_retriever import retrieve_clinical_context
+from utils.rag_retriever import retrieve_document_context
 
 
 def build_rag_payload(query: str, top_k: int = 3) -> Dict[str, Any]:
     """Retrieve context and format it for downstream generation and API output."""
-    retrieved = retrieve_clinical_context(query, top_k=top_k)
+    retrieved = retrieve_document_context(query, top_k=top_k)
 
     context_lines: List[str] = []
     citations: List[Dict[str, Any]] = []
